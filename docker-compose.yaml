@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: llm-api-app
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_API_MODELS_DIR=/models
+      - LLM_API_MODEL_NAME=7b
+    volumes:
+      - "./models:/models:rw"
+      - "./config.yaml:/llm-api/config.yaml:ro"
+    ulimits:
+      memlock: 16000000000
