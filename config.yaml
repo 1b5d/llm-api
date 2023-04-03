@@ -1,4 +1,4 @@
-model_family: llama
+model_family: alpaca
 model_name: 7b
 setup_params:
   repo_id: repo_id

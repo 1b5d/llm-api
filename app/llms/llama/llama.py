@@ -26,7 +26,8 @@ class LlamaLLM(BaseLLM):
 
     def _setup(self):
         model_path = os.path.join(
-            settings.models_dir, f"ggml-llama-{settings.model_name}-q4.bin"
+            settings.models_dir,
+            f"ggml-{settings.model_family}-{settings.model_name}-q4.bin",
         )
 
         if os.path.exists(model_path):
