@@ -9,6 +9,7 @@ from .llama.llama import LlamaLLM
 model_families = {
     "alpaca": LlamaLLM,
     "llama": LlamaLLM,
+    "vicuna": LlamaLLM,
 }
 
 

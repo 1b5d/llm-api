@@ -1,3 +1,4 @@
+models_dir: /models
 model_family: alpaca
 model_name: 7b
 setup_params:

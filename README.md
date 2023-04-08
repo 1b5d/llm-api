@@ -11,8 +11,9 @@ tested with the following models:
 - Alpaca 7b
 - Alpaca 13b 
 - Alpaca 30b
+- Vicuna 13b
 
-Alpaca is based on the Llama Language model, both Alpaca and Llama models are intended only for academic research and any commercial use is prohibited. We don't provide any links to download these models.
+Alpaca and Vicuna are based on the Llama Language model, these models are intended only for academic research and any commercial use is prohibited. This project doesn't provide any links to download these models.
 
 Contribution for supporting more models is welcomed.
 
@@ -20,21 +21,31 @@ Contribution for supporting more models is welcomed.
 
 - [x] Write an implementation for Alpaca
 - [x] Write an implementation for Llama
-- [ ] Write an implementation for RWKV-LM
+- [x] Write an implementation for [Vicuna](https://github.com/lm-sys/FastChat)
 - [ ] Write an implementation for OpenAI
-- [ ] Write an implementation for [Vicuna](https://github.com/lm-sys/FastChat)
+- [ ] Write an implementation for RWKV-LM
 
 # Usage
 
 In order to run this API on a local machine, a running docker engine is needed.
 
-run using docker-compose:
+run using docker:
+
+create a `config.yaml` file with the configs described below and then run:
+
+```
+docker run -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 --ulimit memlock=16000000000 1b5d/llm-api
+```
+
+or use the `docker-compose.yaml` in this repo and run using compose:
 
 ```
 docker compose up
 ```
 
 When running for the first time, the app will download the model from huggingface based on the configurations in `setup_params` and name the local model file accordingly, on later runs it looks up the same local file and loads it into memory
+
+## Config
 
 to configure the application, edit `config.yaml` which is mounted into the docker container, the config file looks like this:
 
@@ -48,7 +59,7 @@ model_params:
   key: value
 ```
 
-`setup_params` and `model_params` are model specific.
+`setup_params` and `model_params` are model specific, see below for model specific configs.
 
 You can override any of the above mentioned configs using environment vars prefixed with `LLM_API_` for example: `LLM_API_MODELS_DIR=/models`
 
@@ -93,8 +104,8 @@ model_name: 7b
 setup_params:
   repo_id: user/repo_id
   filename: ggml-model-q4_0.bin
-  convert: true
-  migrate: true
+  convert: false
+  migrate: false
 model_params:
   ctx_size: 2000
   seed: -1
@@ -106,8 +117,8 @@ model_params:
 
 Fill `repo_id` and `filename` to a huggingface repo where a model is hosted, and let the application download it for you.
 
-- `convert` refers to https://github.com/ggerganov/llama.cpp/blob/master/convert-unversioned-ggml-to-ggml.py set this to true when you need to apply this script
-- `migrate` refers to https://github.com/ggerganov/llama.cpp/blob/master/migrate-ggml-2023-03-30-pr613.py set this to true when you need to apply this script
+- `convert` refers to https://github.com/ggerganov/llama.cpp/blob/master/convert-unversioned-ggml-to-ggml.py set this to true when you need to use an older model which needs to be converted
+- `migrate` refers to https://github.com/ggerganov/llama.cpp/blob/master/migrate-ggml-2023-03-30-pr613.py set this to true when you need to apply this script to an older model which needs to be migrated
 
 the following example shows the different params you can sent to Alpaca generate and agenerate endpoints:
 

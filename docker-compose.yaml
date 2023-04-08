@@ -8,7 +8,6 @@ services:
       - "8000:8000"
     environment:
       - LLM_API_MODELS_DIR=/models
-      - LLM_API_MODEL_NAME=7b
     volumes:
       - "./models:/models:rw"
       - "./config.yaml:/llm-api/config.yaml:ro"

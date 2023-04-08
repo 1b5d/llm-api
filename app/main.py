@@ -5,7 +5,7 @@ from logging.config import dictConfig
 from typing import Any, Dict, Optional
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 from sse_starlette.sse import EventSourceResponse
@@ -60,30 +60,34 @@ llm = ModelClass(params=settings.model_params)
 
 
 @app.post("/generate")
-def generate(request: GenerateRequest):
+def generate(payload: GenerateRequest):
     """
     Generate text based on a text prompt
     """
-    return llm.generate(prompt=request.prompt, params=request.params)
+    return llm.generate(prompt=payload.prompt, params=payload.params)
 
 
 @app.post("/agenerate")
-def agenerate(request: GenerateRequest):
+def agenerate(request: Request, payload: GenerateRequest):
     """
     Generate a stream of text based on a text prompt
     """
-    return EventSourceResponse(
-        token
-        async for token in llm.agenerate(prompt=request.prompt, params=request.params)
-    )
+
+    async def event_publisher():
+        async for token in llm.agenerate(prompt=payload.prompt, params=payload.params):
+            if await request.is_disconnected():
+                break
+            yield token
+
+    return EventSourceResponse(event_publisher())
 
 
 @app.post("/embeddings")
-def embeddings(request: EmbeddingsRequest):
+def embeddings(payload: EmbeddingsRequest):
     """
     Generate embeddings for a text input
     """
-    return llm.embeddings(request.text)
+    return llm.embeddings(payload.text)
 
 
 @app.get("/check")
