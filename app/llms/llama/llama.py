@@ -24,15 +24,10 @@ class LlamaLLM(BaseLLM):
     Llama LLM implementation
     """
 
-    def _setup(self):
-        model_path = os.path.join(
-            settings.models_dir,
-            f"ggml-{settings.model_family}-{settings.model_name}-q4.bin",
-        )
-
+    def _download(self, model_path):
         if os.path.exists(model_path):
             logger.info("found an existing model %s", model_path)
-            return model_path
+            return
 
         logger.info("downloading model to %s", model_path)
 
@@ -48,6 +43,14 @@ class LlamaLLM(BaseLLM):
             os.path.join(settings.models_dir, settings.setup_params["filename"]),
             model_path,
         )
+
+    def _setup(self):
+        model_path = os.path.join(
+            settings.models_dir,
+            f"ggml-{settings.model_family}-{settings.model_name}-q4.bin",
+        )
+
+        self._download(model_path=model_path)
 
         if settings.setup_params["convert"]:
             tokenizer_model_path = os.path.join(settings.models_dir, "tokenizer.model")
@@ -67,14 +70,18 @@ class LlamaLLM(BaseLLM):
                 )
             )
             logger.info("converting model %s", model_path)
-            convert_one_file(model_path, tokenizer)
+            try:
+                convert_one_file(model_path, tokenizer)
+            except Exception as exp:  # pylint: disable=broad-exception-caught
+                logger.warning("Could not convert the model %s", str(exp))
 
         if settings.setup_params["migrate"]:
             logger.info("migrating model %s", model_path)
             migrate(model_path)
             # clean up backed model since we won't need it
             logger.info("cleaning up ..")
-            os.remove(model_path + ".orig")
+            if os.path.exists(model_path + ".orig"):
+                os.remove(model_path + ".orig")
 
         logger.info("setup done successfully for %s", model_path)
         return model_path
