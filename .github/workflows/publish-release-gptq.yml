@@ -4,7 +4,7 @@ on:
   release:
     types: [published]
     tags:
-      - v.*.*.*-gptq-llama-cuda
+      - '*.*.*-gptq-llama-cuda'
 
 jobs:
   push_to_dockerhub:
