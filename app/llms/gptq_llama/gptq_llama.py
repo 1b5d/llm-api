@@ -106,7 +106,7 @@ class GPTQLlamaLLM(BaseLLM):
     ):  # pylint: disable=too-many-arguments
         config = LlamaConfig.from_pretrained(model)
 
-        def noop():
+        def noop(*args, **kwargs):  # pylint: disable=unused-argument
             pass
 
         torch.nn.init.kaiming_uniform_ = noop
