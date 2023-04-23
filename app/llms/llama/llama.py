@@ -1,5 +1,5 @@
 """
-Alpaca LLM implementation
+Llama LLM implementation
 """
 
 import logging

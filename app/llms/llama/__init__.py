@@ -1,5 +1,5 @@
 """
-Alpaca LLM module
+Llama LLM module
 """
 from .llama import LlamaLLM
 

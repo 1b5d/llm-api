@@ -4,12 +4,14 @@ LLMs are mapped here to thier named that used in config
 
 from typing import Type
 
+from .gptq_llama.gptq_llama import GPTQLlamaLLM
 from .llama.llama import LlamaLLM
 
 model_families = {
     "alpaca": LlamaLLM,
     "llama": LlamaLLM,
     "vicuna": LlamaLLM,
+    "gptq_llama": GPTQLlamaLLM,
 }
 
 

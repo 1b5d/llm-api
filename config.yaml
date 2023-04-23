@@ -1,13 +1,10 @@
 models_dir: /models
-model_family: alpaca
-model_name: 7b
+model_family: gptq_llama
 setup_params:
   repo_id: repo_id
-  filename: filename
-  convert: true
-  migrate: true
+  filename: model.safetensors
 model_params:
-  ctx_size: 2000
-  seed: 1337
-  n_threads: 8
-  n_batch: 2048
+  group_size: 128
+  wbits: 4
+  cuda_visible_devices: "0"
+  device: "cuda:0"
