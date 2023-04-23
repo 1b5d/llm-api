@@ -25,8 +25,7 @@ jobs:
         with:
           images: 1b5d/llm-api
           flavor: | 
-            latest=auto
-            suffix=gptq-llama-cuda,onlatest=false
+            latest=false
 
       - name: Build and push
         uses: docker/build-push-action@v4
