@@ -3,12 +3,11 @@ name: Publish Docker image
 on:
   release:
     types: [published]
-    tags:
-      - '!*.*.*-gptq-llama-cuda'
 
 jobs:
   push_to_dockerhub:
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.ref, 'gptq-llama-cuda') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
