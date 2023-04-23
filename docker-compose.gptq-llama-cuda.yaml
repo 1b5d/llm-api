@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  app:
+    image: 1b5d/llm-api:0.0.1-gptq-llama-cuda
+    container_name: llm-api-app
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_API_MODELS_DIR=/models
+    volumes:
+      - "./models:/models:rw"
+      - "./config.yaml:/llm-api/config.yaml:ro"
+    ulimits:
+      memlock: 16000000000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]

@@ -155,6 +155,12 @@ curl --location 'localhost:8000/generate' \
 
 You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.1-gptq-llama-cuda` instead of the default image.
 
+a separate docker-compose file is also available to run this mode:
+
+```
+docker compose -f docker-compose.gptq-llama-cuda.yaml up
+```
+
 Example config file:
 
 ```
