@@ -153,7 +153,7 @@ curl --location 'localhost:8000/generate' \
 
 **Note**: According to [nvidia-docker](https://github.com/NVIDIA/nvidia-docker), you might want to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine
 
-You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.1-gptq-llama-cuda` instead of the default image.
+You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.2-gptq-llama-cuda` instead of the default image.
 
 a separate docker-compose file is also available to run this mode:
 
