@@ -1,0 +1,10 @@
+models_dir: /models
+model_family: gptq_llama
+setup_params:
+  repo_id: anon8231489123/gpt4-x-alpaca-13b-native-4bit-128g # TheBloke/gpt4-alpaca-lora-30B-GPTQ-4bit-128g # anon8231489123/vicuna-13b-GPTQ-4bit-128g
+  filename: gpt-x-alpaca-13b-native-4bit-128g.pt # gpt4-alpaca-lora-30B-GPTQ-4bit-128g.safetensors # vicuna-13b-4bit-128g.safetensors
+model_params:
+  group_size: 128
+  wbits: 4
+  cuda_visible_devices: "1" # force second GPU
+  device: "cuda:0" # target first GPU visible (second GPU on host per above)

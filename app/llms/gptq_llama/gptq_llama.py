@@ -99,7 +99,13 @@ class GPTQLlamaLLM(BaseLLM):
         )
 
         self.model.to(self.device)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model, use_fast=False)
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model, use_fast=False)
+        except huggingface_hub.utils._validators.HFValidationError as e:
+            logger.error(e)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                settings.setup_params["repo_id"], use_fast=False
+            )
 
     def _load_quant(
         self, model, checkpoint, wbits, groupsize, device
@@ -130,7 +136,8 @@ class GPTQLlamaLLM(BaseLLM):
             if checkpoint.endswith(".safetensors"):
                 if device == -1:
                     device = "cpu"
-                model.load_state_dict(safe_load(checkpoint, device))
+                # FIXME: Use of `strict=True` is not recommended but is currently only way to ensure safetensors load.
+                model.load_state_dict(safe_load(checkpoint, str(device)), strict=True)
             else:
                 model.load_state_dict(torch.load(checkpoint))
             model.seqlen = 2048
