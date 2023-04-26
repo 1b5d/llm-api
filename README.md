@@ -203,3 +203,4 @@ credits goes to
 - [serge](https://github.com/nsarrazin/serge) for providing an example on how to build an API using FastApi
 - [llama-cpp-python](https://github.com/abetlen/llama-cpp-python) for the python bindings lib for `llama.cpp`
 - [GPTQ-for-LLaMa](https://github.com/qwopqwop200/GPTQ-for-LLaMa) for providing a GPTQ implementation for Llama based models.
+- [huggingface/text-generation-inference](https://github.com/huggingface/text-generation-inference) for base CUDA Docker image hints.
