@@ -4,13 +4,13 @@ This application can be used to run LLMs (Large Language Models) in docker conta
 
 The main motivation to start this project, was to be able to use different LLMs running on a local machine or a remote server with [langchain](https://github.com/hwchase17/langchain) using [langchain-llm-api](https://github.com/1b5d/langchain-llm-api)
 
-tested on CPU with the following models : 
+tested on CPU with the following models :
 
 - Llama 7b
 - Llama 13b
 - Llama 30b
 - Alpaca 7b
-- Alpaca 13b 
+- Alpaca 13b
 - Alpaca 30b
 - Vicuna 13b
 - Koala 7b
@@ -83,6 +83,7 @@ POST /generate
     }
 }
 ```
+
 ```
 POST /agenerate
 {
@@ -92,13 +93,13 @@ POST /agenerate
     }
 }
 ```
+
 ```
 POST /embeddings
 {
     "text": "What is the capital of France?"
 }
 ```
-
 
 ## Llama / Alpaca on CPU - using llama.cpp
 
@@ -143,7 +144,7 @@ curl --location 'localhost:8000/generate' \
         "temp": 0.1,
         "top_k": 40,
         "top_p": 0.95,
-        "stop": ["\Q"],
+        "stop": ["\\Q"],
         "repeat_penalty": 1.3
     }
 }'
@@ -196,8 +197,9 @@ curl --location 'localhost:8000/generate' \
 
 # Credits
 
-credits goes to 
-- [llama.cpp](https://github.com/ggerganov/llama.cpp) for making it possible to run Llama and Alpaca models on CPU. 
+credits goes to
+
+- [llama.cpp](https://github.com/ggerganov/llama.cpp) for making it possible to run Llama and Alpaca models on CPU.
 - [serge](https://github.com/nsarrazin/serge) for providing an example on how to build an API using FastApi
 - [llama-cpp-python](https://github.com/abetlen/llama-cpp-python) for the python bindings lib for `llama.cpp`
 - [GPTQ-for-LLaMa](https://github.com/qwopqwop200/GPTQ-for-LLaMa) for providing a GPTQ implementation for Llama based models.
