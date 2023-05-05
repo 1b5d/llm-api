@@ -95,7 +95,11 @@ class GPTQLlamaLLM(BaseLLM):
         os.environ["CUDA_VISIBLE_DEVICES"] = cuda_visible_devices
         self.device = torch.device(dev)
         self.model = self._load_quant(
-            settings.setup_params["repo_id"], model_path, wbits, group_size, self.device
+            settings.setup_params["repo_id"],
+            model_path,
+            wbits,
+            group_size,
+            cuda_visible_devices,
         )
 
         self.model.to(self.device)

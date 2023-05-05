@@ -18,6 +18,7 @@ tested on CPU with the following models :
 tested on GPU with GPTQ-for-LlaMa with
 
 - Koala 7B-4bit-128g
+- wizardLM 7B-4bit-128g
 
 Contribution for supporting more models is welcomed.
 
@@ -29,8 +30,8 @@ Contribution for supporting more models is welcomed.
 - [x] Support GPTQ-for-LLaMa
 - [ ] Lora support
 - [ ] huggingface pipeline
-- [ ] Write an implementation for OpenAI
-- [ ] Write an implementation for RWKV-LM
+- [ ] Support OpenAI
+- [ ] Support RWKV-LM
 
 # Usage
 
@@ -151,14 +152,35 @@ curl --location 'localhost:8000/generate' \
 
 ## Llama / Alpaca on GPU - using GPTQ-for-LLaMa (beta)
 
-**Note**: According to [nvidia-docker](https://github.com/NVIDIA/nvidia-docker), you might want to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine
+**Note**: According to [nvidia-docker](https://github.com/NVIDIA/nvidia-docker), you might want to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine. Verify that your nvidia environment is properly by running this:
 
-You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.2-gptq-llama-cuda` instead of the default image.
+```
+docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu20.04 nvidia-smi
+```
+
+You should see a table showing you the current nvidia driver version and some other info:
+```
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 530.30.02              Driver Version: 530.30.02    CUDA Version: 11.7     |
+|-----------------------------------------+----------------------+----------------------+
+...
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+```
+
+You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.3-gptq-llama-cuda` instead of the default image.
 
 a separate docker-compose file is also available to run this mode:
 
 ```
 docker compose -f docker-compose.gptq-llama-cuda.yaml up
+```
+
+or by directly running the container:
+
+```
+docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:0.0.3-gptq-llama-cuda
 ```
 
 Example config file:
