@@ -196,7 +196,10 @@ model_params:
   wbits: 4
   cuda_visible_devices: "0"
   device: "cuda:0"
+  st_device: 0
 ```
+
+**Note**: `st_device` is only needed in the case of safetensors model, otherwise you can either remove it or set it to `-1`
 
 Example request:
 

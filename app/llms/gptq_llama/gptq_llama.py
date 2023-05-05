@@ -91,6 +91,7 @@ class GPTQLlamaLLM(BaseLLM):
         wbits = params.get("wbits", 4)
         cuda_visible_devices = params.get("cuda_visible_devices", "0")
         dev = params.get("device", "cuda:0")
+        st_device = params.get("st_device", -1)
 
         os.environ["CUDA_VISIBLE_DEVICES"] = cuda_visible_devices
         self.device = torch.device(dev)
@@ -99,11 +100,13 @@ class GPTQLlamaLLM(BaseLLM):
             model_path,
             wbits,
             group_size,
-            cuda_visible_devices,
+            st_device,
         )
 
         self.model.to(self.device)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model, use_fast=False)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            settings.setup_params["repo_id"], use_fast=False
+        )
 
     def _load_quant(
         self, model, checkpoint, wbits, groupsize, device

@@ -8,3 +8,4 @@ model_params:
   wbits: 4
   cuda_visible_devices: "0"
   device: "cuda:0"
+  st_device: 0
