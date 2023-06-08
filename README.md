@@ -4,21 +4,20 @@ This application can be used to run LLMs (Large Language Models) in docker conta
 
 The main motivation to start this project, was to be able to use different LLMs running on a local machine or a remote server with [langchain](https://github.com/hwchase17/langchain) using [langchain-llm-api](https://github.com/1b5d/langchain-llm-api)
 
-tested on CPU with the following models : 
+Tested with the following models : 
 
-- Llama 7b
-- Llama 13b
-- Llama 30b
-- Alpaca 7b
-- Alpaca 13b 
-- Alpaca 30b
-- Vicuna 13b
-- Koala 7b
-
-tested on GPU with GPTQ-for-LlaMa with
-
-- Koala 7B-4bit-128g
-- wizardLM 7B-4bit-128g
+- Llama 7b - ggml
+- Llama 13b - ggml
+- Llama 30b - ggml
+- Alpaca 7b - ggml
+- Alpaca 13b - ggml
+- Alpaca 30b - ggml
+- Vicuna 13b - ggml
+- Koala 7b - ggml
+- Vicuna GPTQ 7B-4bit-128g
+- Vicuna GPTQ 13B-4bit-128g
+- Koala GPTQ 7B-4bit-128g
+- wizardLM GPTQ 7B-4bit-128g
 
 Contribution for supporting more models is welcomed.
 
@@ -60,7 +59,6 @@ to configure the application, edit `config.yaml` which is mounted into the docke
 ```
 models_dir: /models     # dir inside the container
 model_family: alpaca
-model_name: 7b
 setup_params:
   key: value
 model_params:
@@ -101,7 +99,7 @@ POST /embeddings
 ```
 
 
-## Llama / Alpaca on CPU - using llama.cpp
+## Llama on CPU - using llama.cpp
 
 Llama and models based on it such as Alpaca and Vicuna are intended only for academic research and any commercial use is prohibited. This project doesn't provide any links to download these models.
 
@@ -110,7 +108,6 @@ You can configure the model usage in a local `config.yaml` file, the configs, he
 ```
 models_dir: /models     # dir inside the container
 model_family: alpaca
-model_name: 7b
 setup_params:
   repo_id: user/repo_id
   filename: ggml-model-q4_0.bin
@@ -169,19 +166,21 @@ You should see a table showing you the current nvidia driver version and some ot
 +---------------------------------------------------------------------------------------+
 ```
 
-You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.3-gptq-llama-cuda` instead of the default image.
+You can also run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:0.0.4-gptq-llama-triton` instead of the default image.
 
 a separate docker-compose file is also available to run this mode:
 
 ```
-docker compose -f docker-compose.gptq-llama-cuda.yaml up
+docker compose -f docker-compose.gptq-llama-triton.yaml up
 ```
 
 or by directly running the container:
 
 ```
-docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:0.0.3-gptq-llama-cuda
+docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:0.0.4-gptq-llama-triton
 ```
+
+**Note**: `llm-api:0.0.x-gptq-llama-cuda` image has been deprecated, please switch to the triton image as it seems more reliable
 
 Example config file:
 

@@ -18,8 +18,8 @@ from app.config import settings
 sys.path.append(os.path.join(os.path.dirname(__file__), "GPTQ-for-LLaMa"))
 
 try:
-    from modelutils import find_layers
-    from quant import make_quant
+    from .GPTQforLLaMa import quant
+    from .GPTQforLLaMa.utils import find_layers
 except ImportError as exp:
     raise ImportError(
         "the GPTQ-for-LLaMa lib is missing, please install it first"
@@ -74,7 +74,11 @@ class GPTQLlamaLLM(BaseLLM):
         )
 
     def _setup(self):
-        model_dir = os.path.join(settings.models_dir, settings.model_family)
+        model_dir = super().get_model_dir(
+            settings.models_dir,
+            settings.model_family,
+            settings.setup_params['filename']
+        )
         model_path = os.path.join(
             model_dir,
             settings.setup_params["filename"],
@@ -91,7 +95,6 @@ class GPTQLlamaLLM(BaseLLM):
         wbits = params.get("wbits", 4)
         cuda_visible_devices = params.get("cuda_visible_devices", "0")
         dev = params.get("device", "cuda:0")
-        st_device = params.get("st_device", -1)
 
         os.environ["CUDA_VISIBLE_DEVICES"] = cuda_visible_devices
         self.device = torch.device(dev)
@@ -100,7 +103,6 @@ class GPTQLlamaLLM(BaseLLM):
             model_path,
             wbits,
             group_size,
-            st_device,
         )
 
         self.model.to(self.device)
@@ -108,12 +110,10 @@ class GPTQLlamaLLM(BaseLLM):
             settings.setup_params["repo_id"], use_fast=False
         )
 
-    def _load_quant(
-        self, model, checkpoint, wbits, groupsize, device
-    ):  # pylint: disable=too-many-arguments
+    def _load_quant(self, model, checkpoint, wbits, groupsize=-1, fused_mlp=True, eval=True, warmup_autotune=True):
         config = LlamaConfig.from_pretrained(model)
 
-        def noop(*args, **kwargs):  # pylint: disable=unused-argument
+        def noop(*args, **kwargs):
             pass
 
         torch.nn.init.kaiming_uniform_ = noop
@@ -125,21 +125,31 @@ class GPTQLlamaLLM(BaseLLM):
             torch.set_default_dtype(torch.half)
             model = LlamaForCausalLM(config)
             torch.set_default_dtype(torch.float)
-            model = model.eval()  # pylint: disable=no-member
+            if eval:
+                model = model.eval()
             layers = find_layers(model)
-            for name in ["lm_head"]:
+            for name in ['lm_head']:
                 if name in layers:
                     del layers[name]
-            make_quant(model, layers, wbits, groupsize)
+            quant.make_quant_linear(model, layers, wbits, groupsize)
+
+            del layers
 
             logger.info("Loading model ...")
-            print("Loading model ...")
             if checkpoint.endswith(".safetensors"):
-                if device == -1:
-                    device = "cpu"
-                model.load_state_dict(safe_load(checkpoint, device))
+                model.load_state_dict(safe_load(checkpoint), strict=False)
             else:
-                model.load_state_dict(torch.load(checkpoint))
+                model.load_state_dict(torch.load(checkpoint), strict=False)
+
+            if eval:
+                quant.make_quant_attn(model)
+                quant.make_quant_norm(model)
+                if fused_mlp:
+                    quant.make_fused_mlp(model)
+            if warmup_autotune:
+                quant.autotune_warmup_linear(model, transpose=not (eval))
+                if eval and fused_mlp:
+                    quant.autotune_warmup_fused(model)
             model.seqlen = 2048
             logger.info("Done loading model.")
 
@@ -165,7 +175,11 @@ class GPTQLlamaLLM(BaseLLM):
                 top_p=top_p,
                 temperature=temperature,
             )
-        return self.tokenizer.decode([el.item() for el in generated_ids[0]])
+        return self.tokenizer.decode(
+            [el.item() for el in generated_ids[:, input_ids.shape[1]:][0]],
+            skip_special_tokens=True, 
+            clean_up_tokenization_spaces=False
+        )
 
     async def agenerate(
         self, prompt: str, params: Dict[str, str]

@@ -7,7 +7,7 @@ on:
 jobs:
   push_to_dockerhub:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.ref, 'gptq-llama-cuda') }}
+    if: ${{ contains(github.ref, 'gptq-llama-triton') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: Dockerfile.gptq-llama-cuda
+          file: Dockerfile.gptq-llama-triton
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

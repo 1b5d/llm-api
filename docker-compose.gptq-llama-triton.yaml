@@ -2,7 +2,7 @@ version: '3'
 
 services:
   app:
-    image: 1b5d/llm-api:0.0.3-gptq-llama-cuda
+    image: 1b5d/llm-api:0.0.4-gptq-llama-triton
     container_name: llm-api-app
     ports:
       - "8000:8000"

@@ -18,7 +18,6 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     """
 
     models_dir: str = "./models"
-    model_name: str = "7b"
     model_family: str
     model_params: Dict[str, Any] = {}
     setup_params: Dict[str, Any] = {}

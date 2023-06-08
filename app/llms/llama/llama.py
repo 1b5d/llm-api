@@ -24,7 +24,7 @@ class LlamaLLM(BaseLLM):
     Llama LLM implementation
     """
 
-    def _download(self, model_path):
+    def _download(self, model_path, model_dir):
         if os.path.exists(model_path):
             logger.info("found an existing model %s", model_path)
             return
@@ -34,23 +34,23 @@ class LlamaLLM(BaseLLM):
         huggingface_hub.hf_hub_download(
             repo_id=settings.setup_params["repo_id"],
             filename=settings.setup_params["filename"],
-            local_dir=settings.models_dir,
+            local_dir=model_dir,
             local_dir_use_symlinks=False,
             cache_dir=os.path.join(settings.models_dir, ".cache"),
         )
 
-        os.rename(
-            os.path.join(settings.models_dir, settings.setup_params["filename"]),
-            model_path,
-        )
-
     def _setup(self):
-        model_path = os.path.join(
+        model_dir = super().get_model_dir(
             settings.models_dir,
-            f"ggml-{settings.model_family}-{settings.model_name}-q4.bin",
+            settings.model_family,
+            settings.setup_params['filename']
+        )
+        model_path = os.path.join(
+            model_dir,
+            settings.setup_params['filename'],
         )
 
-        self._download(model_path=model_path)
+        self._download(model_path, model_dir)
 
         if settings.setup_params["convert"]:
             tokenizer_model_path = os.path.join(settings.models_dir, "tokenizer.model")
