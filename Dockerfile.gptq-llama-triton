@@ -73,8 +73,8 @@ ENV PYTHONPATH "/llm-api"
 RUN git clone https://github.com/qwopqwop200/GPTQ-for-LLaMa
 
 RUN cd GPTQ-for-LLaMa && \
-    pip3 install -r requirements.txt && \
     sed -i -e 's/safetensors==0.3.0/safetensors>=0.3.0/g' requirements.txt && \
+    pip3 install -r requirements.txt && \
     cd ..
 
 RUN touch GPTQ-for-LLaMa/__init__.py && mv GPTQ-for-LLaMa /llm-api/app/llms/gptq_llama/GPTQforLLaMa
