@@ -79,7 +79,7 @@ RUN cd GPTQ-for-LLaMa && \
 
 RUN touch GPTQ-for-LLaMa/__init__.py && \
     mv GPTQ-for-LLaMa GPTQforLLaMa && \
-    mv GPTQforLLaMa /llm-api/app/llms/gptq_llama/GPTQforLLaMa
+    mv GPTQforLLaMa /llm-api/app/llms/gptq_llama/
 
 FROM base
 
