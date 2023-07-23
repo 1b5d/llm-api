@@ -44,7 +44,7 @@ jobs:
         with:
           images: 1b5d/llm-api
           flavor: | 
-            suffix=gpu
+            suffix=-gpu
             latest=false
       
       - name: Build and push
