@@ -1,21 +1,25 @@
 """
 An interface which defines generic LLM related operations
 """
-import os
 import hashlib
+import os
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, Dict, List
 
 
 class BaseLLM(ABC):
-
     """
     A base class for LLMs
     """
 
     def get_model_dir(self, models_dir, model_family, model_name):
-        name_digest = str(int(hashlib.md5(model_name.encode('utf-8')).hexdigest(), 16))[0:12]
-        dir_name = '_'.join([model_family, name_digest])
+        """
+        create a base working dir for a certain model
+        """
+        name_digest = str(int(hashlib.md5(model_name.encode("utf-8")).hexdigest(), 16))[
+            0:12
+        ]
+        dir_name = "_".join([model_family, name_digest])
         return os.path.join(models_dir, dir_name)
 
     @abstractmethod

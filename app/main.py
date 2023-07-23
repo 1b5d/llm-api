@@ -56,7 +56,7 @@ class EmbeddingsRequest(BaseModel):  # pylint: disable=too-few-public-methods
 
 ModelClass = get_model_class(settings.model_family)
 
-llm = ModelClass(params=settings.model_params)
+llm = ModelClass(params=settings.model_params or {})
 
 
 @app.post("/generate")
@@ -64,7 +64,7 @@ def generate(payload: GenerateRequest):
     """
     Generate text based on a text prompt
     """
-    return llm.generate(prompt=payload.prompt, params=payload.params)
+    return llm.generate(prompt=payload.prompt, params=payload.params or {})
 
 
 @app.post("/agenerate")
@@ -74,7 +74,9 @@ def agenerate(request: Request, payload: GenerateRequest):
     """
 
     async def event_publisher():
-        async for token in llm.agenerate(prompt=payload.prompt, params=payload.params):
+        async for token in llm.agenerate(
+            prompt=payload.prompt, params=payload.params or {}
+        ):
             if await request.is_disconnected():
                 break
             yield token

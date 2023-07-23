@@ -4,14 +4,29 @@ LLMs are mapped here to thier named that used in config
 
 from typing import Type
 
-from .gptq_llama.gptq_llama import GPTQLlamaLLM
-from .llama.llama import LlamaLLM
+
+def _load_llama():
+    from .llama.llama import LlamaLLM  # pylint: disable=C0415
+
+    return LlamaLLM
+
+
+def _load_gptq_llama():
+    from .gptq_llama.gptq_llama import GPTQLlamaLLM  # pylint: disable=C0415
+
+    return GPTQLlamaLLM
+
+
+def _load_hugging_face():
+    from .huggingface.huggingface import HuggingFaceLLM  # pylint: disable=C0415
+
+    return HuggingFaceLLM
+
 
 model_families = {
-    "alpaca": LlamaLLM,
-    "llama": LlamaLLM,
-    "vicuna": LlamaLLM,
-    "gptq_llama": GPTQLlamaLLM,
+    "llama": _load_llama,
+    "gptq_llama": _load_gptq_llama,
+    "huggingface": _load_hugging_face,
 }
 
 
@@ -21,4 +36,4 @@ def get_model_class(name: str) -> Type:
     """
     if name not in model_families:
         raise RuntimeError(f"model {name} is not supported")
-    return model_families[name]
+    return model_families[name]()

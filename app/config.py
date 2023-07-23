@@ -4,7 +4,7 @@ Config management for llm-api
 
 import logging
 import os
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import yaml
 from pydantic import BaseSettings
@@ -19,7 +19,7 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
 
     models_dir: str = "./models"
     model_family: str
-    model_params: Dict[str, Any] = {}
+    model_params: Optional[Dict[str, Any]] = {}
     setup_params: Dict[str, Any] = {}
     host: str = "0.0.0.0"
     port: int = 8000

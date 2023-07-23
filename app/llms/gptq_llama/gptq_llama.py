@@ -77,7 +77,7 @@ class GPTQLlamaLLM(BaseLLM):
         model_dir = super().get_model_dir(
             settings.models_dir,
             settings.model_family,
-            settings.setup_params['filename']
+            settings.setup_params["filename"],
         )
         model_path = os.path.join(
             model_dir,
@@ -110,10 +110,19 @@ class GPTQLlamaLLM(BaseLLM):
             settings.setup_params["repo_id"], use_fast=False
         )
 
-    def _load_quant(self, model, checkpoint, wbits, groupsize=-1, fused_mlp=True, eval=True, warmup_autotune=True):
+    def _load_quant(
+        self,
+        model,
+        checkpoint,
+        wbits,
+        groupsize=-1,
+        fused_mlp=True,
+        eval=True,  # pylint: disable=redefined-builtin
+        warmup_autotune=True,
+    ):  # pylint: disable=too-many-arguments
         config = LlamaConfig.from_pretrained(model)
 
-        def noop(*args, **kwargs):
+        def noop(*args, **kwargs):  # pylint: disable=unused-argument
             pass
 
         torch.nn.init.kaiming_uniform_ = noop
@@ -128,7 +137,7 @@ class GPTQLlamaLLM(BaseLLM):
             if eval:
                 model = model.eval()
             layers = find_layers(model)
-            for name in ['lm_head']:
+            for name in ["lm_head"]:
                 if name in layers:
                     del layers[name]
             quant.make_quant_linear(model, layers, wbits, groupsize)
@@ -147,7 +156,7 @@ class GPTQLlamaLLM(BaseLLM):
                 if fused_mlp:
                     quant.make_fused_mlp(model)
             if warmup_autotune:
-                quant.autotune_warmup_linear(model, transpose=not (eval))
+                quant.autotune_warmup_linear(model, transpose=not eval)
                 if eval and fused_mlp:
                     quant.autotune_warmup_fused(model)
             model.seqlen = 2048
@@ -176,9 +185,9 @@ class GPTQLlamaLLM(BaseLLM):
                 temperature=temperature,
             )
         return self.tokenizer.decode(
-            [el.item() for el in generated_ids[:, input_ids.shape[1]:][0]],
-            skip_special_tokens=True, 
-            clean_up_tokenization_spaces=False
+            [el.item() for el in generated_ids[:, input_ids.shape[1] :][0]],
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False,
         )
 
     async def agenerate(
