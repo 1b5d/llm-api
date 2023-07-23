@@ -41,7 +41,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ steps.meta.outputs.tags }}
+          cache-from: type=registry,ref=1b5d/llm-api:latest
           cache-to: type=inline
 
   push_gpu_to_dockerhub:
@@ -68,8 +68,7 @@ jobs:
         with:
           images: 1b5d/llm-api
           flavor: | 
-            suffix=-gpu
-            latest=false
+            suffix=-gpu,onlatest=true
       
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -80,5 +79,5 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta-gpu.outputs.tags }}
           labels: ${{ steps.meta-gpu.outputs.labels }}
-          cache-from: type=registry,ref=${{ steps.meta-gpu.outputs.tags }}
+          cache-from: type=registry,ref=1b5d/llm-api:latest-gpu
           cache-to: type=inline
