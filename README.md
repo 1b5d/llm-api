@@ -134,6 +134,8 @@ To be able to accelerate inference using GPU, the `1b5d/llm-api:x.x.x-gpu` image
 docker compose -f docker-compose.gpu.yaml up
 ```
 
+Note: currenty only `linux/amd64` architecture is supported for gpu images
+
 ## Llama on CPU - using llama.cpp
 
 You can configure the model usage in a local `config.yaml` file, the configs, here is an example:
@@ -266,7 +268,7 @@ This app was tested with the following models :
 - Llama and models based on it (ALpaca, Vicuna, Koala ..etc.) using the ggml format
 - Llama and models based on it (ALpaca, Vicuna, Koala ..etc.) using the GPTQ format (4bit-128g)
 - Popular models on huggingface (MPT, GPT2, Falcon) using PT format 
-- Llama 2 using the ggml format
+- Llama 2 using ggml and gptq formats
 
 # Credits
 
