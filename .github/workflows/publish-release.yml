@@ -3,6 +3,10 @@ name: Publish Docker image
 on:
   release:
     types: [published]
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
 
 jobs:
   push_to_dockerhub:
