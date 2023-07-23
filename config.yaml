@@ -1,21 +1,10 @@
 models_dir: /models
-model_family: llama
+model_family: gptq_llama
 setup_params:
-  repo_id: TheBloke/Llama-2-7B-Chat-GGML
-  filename: llama-2-7b-chat.ggmlv3.q4_0.bin
+  repo_id: <repo id>
+  filename: gptq_model-4bit-128g.safetensors
 model_params:
-  n_ctx: 512
-  n_parts: -1
-  n_gpu_layers: 0
-  seed: -1
-  use_mmap: True
-  n_threads: 8
-  n_batch: 2048
-  last_n_tokens_size: 64
-  lora_base: null
-  lora_path: null
-  low_vram: False
-  tensor_split: null
-  rope_freq_base: 10000.0
-  rope_freq_scale: 1.0
-  verbose: True
+  group_size: 128
+  wbits: 4
+  cuda_visible_devices: "0"
+  device: "cuda:0"

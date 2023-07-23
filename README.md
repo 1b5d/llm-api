@@ -268,7 +268,7 @@ This app was tested with the following models :
 - Llama and models based on it (ALpaca, Vicuna, Koala ..etc.) using the ggml format
 - Llama and models based on it (ALpaca, Vicuna, Koala ..etc.) using the GPTQ format (4bit-128g)
 - Popular models on huggingface (MPT, GPT2, Falcon) using PT format 
-- Llama 2 using the ggml format
+- Llama 2 using ggml and gptq formats
 
 # Credits
 
