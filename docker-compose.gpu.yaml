@@ -2,7 +2,7 @@ version: '3'
 
 services:
   app:
-    image: 1b5d/llm-api:huggingface
+    image: 1b5d/llm-api:latest-gpu
     container_name: llm-api-app
     ports:
       - "8000:8000"
