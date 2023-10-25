@@ -1,11 +1,12 @@
 FROM debian:bullseye-slim as pytorch-install
 
-ARG PYTORCH_VERSION=2.0.0
+ARG PYTORCH_VERSION=2.0.1
 ARG PYTHON_VERSION=3.9
 ARG CUDA_VERSION=11.7.1
 ARG MAMBA_VERSION=23.1.0-4
 ARG CUDA_CHANNEL=nvidia
 ARG INSTALL_CHANNEL=pytorch
+ARG TORCH_CUDA_ARCH_LIST="3.7;5.0;6.0;7.0;7.5;8.0;8.6+PTX"
 # Automatically set by buildx
 ARG TARGETPLATFORM
 
@@ -46,7 +47,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
-RUN /opt/conda/bin/conda install -q -c "nvidia/label/cuda-11.7.1"  cuda==11.7.1 && \
+RUN /opt/conda/bin/conda install -qy -c "nvidia/label/cuda-11.7.1"  cuda==11.7.1 && \
     /opt/conda/bin/conda clean -yqa
 
 FROM debian:bullseye-slim as base
@@ -69,8 +70,7 @@ WORKDIR /llm-api
 COPY ./requirements.txt /llm-api/requirements.txt
 RUN pip3 install --no-cache-dir --upgrade -r requirements.txt && \
     pip3 install --no-cache-dir accelerate==0.20.3 packaging==23.0 ninja==1.11.1 && \
-    pip3 install --no-cache-dir --no-build-isolation flash-attn==v1.0.9 && \
-    pip3 install --no-cache-dir triton-pre-mlir@git+https://github.com/vchiley/triton.git@triton_pre_mlir#subdirectory=python && rm -fr $HOME/.triton && \
+    pip3 install --no-cache-dir --no-build-isolation flash-attn==v2.3.3 && \
     pip3 cache purge && \
     /opt/conda/bin/conda clean -ya
 
