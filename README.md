@@ -1,50 +1,35 @@
 # LLM API
 
-This application can be used to run LLMs (Large Language Models) in docker containers, it's built in a generic way so that it can be reused for multiple types of models.
+Welcome to the LLM-API project! This endeavor opens the door to the exciting world of Large Language Models (LLMs) by offering a versatile API that allows you to effortlessly run a variety of LLMs on different consumer hardware configurations. Whether you prefer to operate these powerful models within Docker containers or directly on your local machine, this solution is designed to adapt to your preferences.
 
-The main motivation to start this project, was to be able to use different LLMs running on a local machine or a remote server with [langchain](https://github.com/hwchase17/langchain) using [langchain-llm-api](https://github.com/1b5d/langchain-llm-api)
+With LLM-API, all you need to get started is a simple YAML configuration file. the app streamlines the process by automatically downloading the model of your choice and executing it seamlessly. Once initiated, the model becomes accessible through a unified and intuitive API.
 
-Contribution for supporting more models is welcomed.
+There is also a client that's reminiscent of OpenAI's approach, making it easy to harness the capabilities of your chosen LLM. You can find the Python at [llm-api-python](https://github.com/1b5d/llm-api-python)
 
-### roadmap
+In addition to this, a LangChain integration exists, further expanding the possibilities and potential applications of LLM-API. You can explore this integration at [langchain-llm-api](https://github.com/1b5d/langchain-llm-api)
 
-- [x] Write an implementation for Alpaca
-- [x] Write an implementation for Llama
-- [x] Write an implementation for [Vicuna](https://github.com/lm-sys/FastChat)
-- [x] Support GPTQ-for-LLaMa
-- [x] huggingface pipeline
-- [x] Llama 2
-- [ ] Lora support
-- [ ] Support OpenAI
+Whether you're a developer, researcher, or enthusiast, the LLM-API project simplifies the use of Large Language Models, making their power and potential accessible to all.
+
+LLM enthusiasts, developers, researchers, and creators are invited to join this growing community. Your contributions, ideas, and feedback are invaluable in shaping the future of LLM-API. Whether you want to collaborate on improving the core functionality, develop new integrations, or suggest enhancements, your expertise is highly appreciated
+
+### Tested with
+
+- [x] Different Llama based-models in different versions such as (Llama, Alpaca, Vicuna, Llama 2 ) on CPU using llama.cpp
+- [x] Llama & Llama 2 based models using GPTQ-for-LLaMa
+- [x] Generic huggingface pipeline e.g. gpt-2, MPT
+- [x] Mistral 7b
+- [x] OpenAI-like interface using [llm-api-python](https://github.com/1b5d/llm-api-python)
 - [ ] Support RWKV-LM
 
 # Usage
 
-In order to run this API on a local machine, a running docker engine is needed.
+To run LLM-API on a local machine, you must have a functioning Docker engine. The following steps outline the process for running LLM-API:
 
-run using docker:
-
-create a `config.yaml` file with the configs described below and then run:
-
-```
-docker run -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 --ulimit memlock=16000000000 1b5d/llm-api
-```
-
-or use the `docker-compose.yaml` in this repo and run using compose:
-
-```
-docker compose up
-```
-
-When running for the first time, the app will download the model from huggingface based on the configurations in `setup_params` and name the local model file accordingly, on later runs it looks up the same local file and loads it into memory
-
-## Config
-
-to configure the application, edit `config.yaml` which is mounted into the docker container, the config file looks like this:
+1. **Create a Configuration File**: Begin by creating a `config.yaml` file with the configurations as described below.
 
 ```
 models_dir: /models     # dir inside the container
-model_family: llama
+model_family: llama     # also `gptq_llama` or `huggingface`
 setup_params:
   key: value
 model_params:
@@ -55,34 +40,66 @@ model_params:
 
 You can override any of the above mentioned configs using environment vars prefixed with `LLM_API_` for example: `LLM_API_MODELS_DIR=/models`
 
+2. **Run LLM-API Using Docker**: Execute the following command in your terminal:
+
+```
+docker run -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 --ulimit memlock=16000000000 1b5d/llm-api
+```
+
+This command launches a Docker container and mounts your local directory for models, the configuration file, and maps port 8000 for API access.
+
+**Alternatively**, you can use the provided `docker-compose.yaml` file within this repository and run the application using Docker Compose. To do so, execute the following command:
+
+```
+docker compose up
+```
+
+Upon the first run, LLM-API will download the model from Hugging Face, based on the configurations defined in the `setup_params` of your `config.yaml` file. It will then name the local model file accordingly. Subsequent runs will reference the same local model file and load it into memory for seamless operation
+
+
 ## Endpoints
 
-In general all LLMs will have a generalized set of endpoints
+The LLM-API provides a standardized set of endpoints that are applicable across all Large Language Models (LLMs). These endpoints enable you to interact with the models effectively. Here are the primary endpoints:
 
-```
-POST /generate
-{
-    "prompt": "What is the capital of France?",
-    "params": {
-        ...
+### 1. Generate Text
+
+- **POST /generate**
+  - Request Example:
+    ```json
+    {
+        "prompt": "What is the capital of France?",
+        "params": {
+            // Additional parameters...
+        }
     }
-}
-```
-```
-POST /agenerate
-{
-    "prompt": "What is the capital of France?",
-    "params": {
-        ...
+    ```
+  - Description: Use this endpoint to generate text based on a given prompt. You can include additional parameters for fine-tuning and customization.
+
+### 2. Async Text Generation
+
+- **POST /agenerate**
+  - Request Example:
+    ```json
+    {
+        "prompt": "What is the capital of France?",
+        "params": {
+            // Additional parameters...
+        }
     }
-}
-```
-```
-POST /embeddings
-{
-    "text": "What is the capital of France?"
-}
-```
+    ```
+  - Description: This endpoint is designed for asynchronous text generation. It allows you to initiate text generation tasks that can run in the background while your application continues to operate.
+
+### 3. Text Embeddings
+
+- **POST /embeddings**
+  - Request Example:
+    ```json
+    {
+        "text": "What is the capital of France?"
+    }
+    ```
+  - Description: Use this endpoint to obtain embeddings for a given text. This is valuable for various natural language processing tasks such as semantic similarity and text analysis.
+
 
 ## Huggingface transformers
 
@@ -105,11 +122,13 @@ model_params:
   torch_dtype: torch.bfloat16
 ```
 
-Note that you can pass configuration attributes in `config_params` in order to configure `AutoConfig` with additional attributes.
+Leverage the flexibility of LLM-API by configuring various attributes using the following methods:
 
-Configurations in `model_params` are directly passed into the `AutoModelForCausalLM.from_pretrained` and `AutoTokenizer.from_pretrained` initialization calls.
+1. Pass specific configuration attributes within the `config_params` to fine-tune `AutoConfig`. These attributes allow you to tailor the behavior of your language model further.
 
-The following is an example with some parameters passed to the `generate` (or `agenerate`) endpoints, but you can pass any argments which is accepted by [transformer's GenerationConfig](https://huggingface.co/docs/transformers/main/en/main_classes/text_generation#transformers.GenerationConfig):
+2. Modify the model's parameters directly by specifying them within the `model_params`. These parameters are passed into the `AutoModelForCausalLM.from_pretrained` and `AutoTokenizer.from_pretrained` initialization calls.
+
+Here's an example of how you can use parameters in the `generate` (or `agenerate`) endpoints, but remember, you can pass any arguments accepted by [transformer's GenerationConfig](https://huggingface.co/docs/transformers/main/en/main_classes/text_generation#transformers.GenerationConfig):
 
 ```
 POST /generate
@@ -128,17 +147,17 @@ curl --location 'localhost:8000/generate' \
 }'
 ```
 
-To be able to accelerate inference using GPU, the `1b5d/llm-api:x.x.x-gpu` image can be used for this purpose. When running the docker image using compose, a dedicate compose file can be used:
+If you're looking to accelerate inference using a GPU, the `1b5d/llm-api:x.x.x-gpu` image is designed for this purpose. When running the Docker image using Compose, consider utilizing a dedicated Compose file for GPU support:
 
 ```
 docker compose -f docker-compose.gpu.yaml up
 ```
 
-Note: currenty only `linux/amd64` architecture is supported for gpu images
+**Note**: currenty only `linux/amd64` architecture is supported for gpu images
 
 ## Llama on CPU - using llama.cpp
 
-You can configure the model usage in a local `config.yaml` file, the configs, here is an example:
+Utilizing Llama on a CPU is made simple by configuring the model usage in a local `config.yaml` file. Below are the possible configurations:
 
 ```
 models_dir: /models
@@ -164,12 +183,9 @@ model_params:
   verbose: True
 ```
 
-Fill `repo_id` and `filename` to a huggingface repo where a model is hosted, and let the application download it for you.
+Ensure to specify the repo_id and filename parameters to point to a Hugging Face repository where the desired model is hosted. The application will then handle the download for you.
 
-- `convert` refers to https://github.com/ggerganov/llama.cpp/blob/master/convert-unversioned-ggml-to-ggml.py set this to true when you need to use an older model which needs to be converted
-- `migrate` refers to https://github.com/ggerganov/llama.cpp/blob/master/migrate-ggml-2023-03-30-pr613.py set this to true when you need to apply this script to an older model which needs to be migrated
-
-the following example shows the different params you can sent to Llama generate and agenerate endpoints:
+The following example demonstrates the various parameters that can be sent to the Llama generate and agenerate endpoints:
 
 ```
 POST /generate
@@ -194,40 +210,29 @@ curl --location 'localhost:8000/generate' \
 }'
 ```
 
-## Llama / Alpaca on GPU - using GPTQ-for-LLaMa
+## Llama on GPU - using GPTQ-for-LLaMa
 
-**Note**: According to [nvidia-docker](https://github.com/NVIDIA/nvidia-docker), you might want to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine. Verify that your nvidia environment is properly by running this:
+**Important Note**: Before running Llama or Llama 2 on GPU, make sure to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine. You can verify the NVIDIA environment by executing the following command:
 
 ```
 docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu20.04 nvidia-smi
 ```
 
-You should see a table showing you the current nvidia driver version and some other info:
-```
-+---------------------------------------------------------------------------------------+
-| NVIDIA-SMI 530.30.02              Driver Version: 530.30.02    CUDA Version: 11.7     |
-|-----------------------------------------+----------------------+----------------------+
-...
-|=======================================================================================|
-|  No running processes found                                                           |
-+---------------------------------------------------------------------------------------+
-```
+You should see a table displaying the current NVIDIA driver version and related information, confirming the proper setup.
 
-You can run the Llama model using GPTQ-for-LLaMa 4 bit quantization, you can use a docker image specially built for that purpose `1b5d/llm-api:x.x.x-gpu` instead of the default image.
-
-a separate docker-compose file is also available to run this mode:
+When running the Llama model with GPTQ-for-LLaMa 4-bit quantization, you can use a specialized Docker image designed for this purpose, `1b5d/llm-api:x.x.x-gpu`, as an alternative to the default image. You can run this mode using a separate Docker Compose file:
 
 ```
 docker compose -f docker-compose.gpu.yaml up
 ```
 
-or by directly running the container:
+Or by directly running the container:
 
 ```
 docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:x.x.x-gpu
 ```
 
-**Note**: `llm-api:x.x.x-gptq-llama-cuda` and `llm-api:x.x.x-gptq-llama-triton` images have been deprecated, please switch to the `1b5d/llm-api:x.x.x-gpu` image when gpu support is required
+**Important Note**: The `llm-api:x.x.x-gptq-llama-cuda` and `llm-api:x.x.x-gptq-llama-triton` images have been deprecated. Please switch to the `1b5d/llm-api:x.x.x-gpu` image when GPU support is required
 
 Example config file:
 
@@ -262,16 +267,9 @@ curl --location 'localhost:8000/generate' \
 }'
 ```
 
-
-This app was tested with the following models : 
-
-- Llama and models based on it (ALpaca, Vicuna, Koala ..etc.) using the ggml format
-- Llama and models based on it (ALpaca, Vicuna, Koala ..etc.) using the GPTQ format (4bit-128g)
-- Popular models on huggingface (MPT, GPT2, Falcon) using PT format 
-- Llama 2 using ggml and gptq formats
-
 # Credits
 
 - [llama.cpp](https://github.com/ggerganov/llama.cpp) for making it possible to run Llama models on CPU. 
-- [llama-cpp-python](https://github.com/abetlen/llama-cpp-python) for the python bindings lib for `llama.cpp`
+- [llama-cpp-python](https://github.com/abetlen/llama-cpp-python) for the python bindings lib for `llama.cpp`.
 - [GPTQ-for-LLaMa](https://github.com/qwopqwop200/GPTQ-for-LLaMa) for providing a GPTQ implementation for Llama based models.
+- Huggingface for the great ecosystem of tooling they provide.
