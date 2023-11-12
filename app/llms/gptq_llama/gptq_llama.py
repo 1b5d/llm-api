@@ -18,7 +18,7 @@ from app.config import settings
 sys.path.append(os.path.join(os.path.dirname(__file__), "GPTQ-for-LLaMa"))
 
 try:
-    from .GPTQforLLaMa import quant
+    from .GPTQforLLaMa import quant  # type: ignore
     from .GPTQforLLaMa.utils import find_layers
 except ImportError as exp:
     raise ImportError(

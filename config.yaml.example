@@ -1,0 +1,59 @@
+models_dir: /models
+model_family: huggingface
+setup_params:
+  repo_id: <repo_id>
+  tokenizer_repo_id: <repo_id>
+  trust_remote_code: True
+  config_params:
+    init_device: cuda:0
+    attn_config:
+      attn_impl: triton
+model_params:
+  device_map: "cuda:0"
+  trust_remote_code: True
+  torch_dtype: torch.bfloat16
+---
+models_dir: /models
+model_family: llama
+setup_params:
+  repo_id: user/repo_id
+  filename: ggml-model-q4_0.bin
+model_params:
+  n_ctx: 512
+  n_parts: -1
+  n_gpu_layers: 0
+  seed: -1
+  use_mmap: True
+  n_threads: 8
+  n_batch: 2048
+  last_n_tokens_size: 64
+  lora_base: null
+  lora_path: null
+  low_vram: False
+  tensor_split: null
+  rope_freq_base: 10000.0
+  rope_freq_scale: 1.0
+  verbose: True
+---
+models_dir: /models
+model_family: gptq_llama
+setup_params:
+  repo_id: user/repo_id
+  filename: <model.safetensors or model.pt>
+model_params:
+  group_size: 128
+  wbits: 4
+  cuda_visible_devices: "0"
+  device: "cuda:0"
+---
+models_dir: /models
+model_family: autoawq
+setup_params:
+  repo_id: <repo id>
+  tokenizer_repo_id: <repo id>
+  filename: model.safetensors
+model_params:
+  trust_remote_code: False
+  fuse_layers: False
+  safetensors: True
+  device_map: "cuda:0"
