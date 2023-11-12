@@ -190,7 +190,6 @@ Running in this mode can be done using the docker image `1b5d/llm-api:latest`, s
 - OpenBLAS: `1b5d/llm-api:latest-openblas`
 - cuBLAS: `1b5d/llm-api:latest-cublas`
 - CLBlast: `1b5d/llm-api:latest-clblast`
-- Metal: `1b5d/llm-api:latest-metal`
 - hipBLAS: `1b5d/llm-api:latest-hipblas`
 
 

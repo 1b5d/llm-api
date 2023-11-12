@@ -22,8 +22,6 @@ jobs:
             cmake_args: "-DLLAMA_CUBLAS=on"
           - suffix: -clblast
             cmake_args: "-DLLAMA_CLBLAST=on"
-          - suffix: -metal
-            cmake_args: "-DLLAMA_METAL=on"
           - suffix: -hipblas
             cmake_args: "-DLLAMA_HIPBLAS=on"
     steps:
