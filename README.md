@@ -186,6 +186,14 @@ model_params:
 
 Ensure to specify the repo_id and filename parameters to point to a Hugging Face repository where the desired model is hosted. The application will then handle the download for you.
 
+Running in this mode can be done using the docker image `1b5d/llm-api:latest`, several images are also available to support different BLAS backends:
+- OpenBLAS: `1b5d/llm-api:latest-openblas`
+- cuBLAS: `1b5d/llm-api:latest-cublas`
+- CLBlast: `1b5d/llm-api:latest-clblast`
+- Metal: `1b5d/llm-api:latest-metal`
+- hipBLAS: `1b5d/llm-api:latest-hipblas`
+
+
 The following example demonstrates the various parameters that can be sent to the Llama generate and agenerate endpoints:
 
 ```
@@ -246,7 +254,7 @@ docker compose -f docker-compose.gpu.yaml up
 **Important Note**: Before running Llama or Llama 2 on GPU, make sure to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine. You can verify the NVIDIA environment by executing the following command:
 
 ```
-docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu20.04 nvidia-smi
+docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu20.04 nvidia-smi
 ```
 
 You should see a table displaying the current NVIDIA driver version and related information, confirming the proper setup.

@@ -4,7 +4,8 @@ WORKDIR /llm-api
 
 COPY ./requirements.txt /llm-api/requirements.txt
 ENV FORCE_CMAKE "1"
-ENV CMAKE_ARGS "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
+ARG CMAKE_ARGS
+ENV CMAKE_ARGS=${CMAKE_ARGS:-""}
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 

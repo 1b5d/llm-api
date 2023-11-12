@@ -11,6 +11,21 @@ on:
 jobs:
   push_to_dockerhub:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - suffix:
+            cmake_args: ""
+          - suffix: -openblas
+            cmake_args: "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
+          - suffix: -cublas
+            cmake_args: "-DLLAMA_CUBLAS=on"
+          - suffix: -clblast
+            cmake_args: "-DLLAMA_CLBLAST=on"
+          - suffix: -metal
+            cmake_args: "-DLLAMA_METAL=on"
+          - suffix: -hipblas
+            cmake_args: "-DLLAMA_HIPBLAS=on"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -32,6 +47,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: 1b5d/llm-api
+          flavor: | 
+            suffix=${{ matrix.suffix }},onlatest=true
 
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -43,6 +60,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=1b5d/llm-api:latest
           cache-to: type=inline
+          build-args: |
+            "CMAKE_ARGS=${{ matrix.cmake_args }}"
 
   push_gpu_to_dockerhub:
     runs-on: ubuntu-latest
