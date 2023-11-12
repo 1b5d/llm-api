@@ -23,10 +23,17 @@ def _load_hugging_face():
     return HuggingFaceLLM
 
 
+def _load_autoawq():
+    from .autoawq.autoawq import AutoAWQ  # pylint: disable=C0415
+
+    return AutoAWQ
+
+
 model_families = {
     "llama": _load_llama,
     "gptq_llama": _load_gptq_llama,
     "huggingface": _load_hugging_face,
+    "autoawq": _load_autoawq,
 }
 
 

@@ -15,9 +15,10 @@ LLM enthusiasts, developers, researchers, and creators are invited to join this 
 ### Tested with
 
 - [x] Different Llama based-models in different versions such as (Llama, Alpaca, Vicuna, Llama 2 ) on CPU using llama.cpp
-- [x] Llama & Llama 2 based models using GPTQ-for-LLaMa
+- [x] Llama & Llama 2 quantized models using GPTQ-for-LLaMa
 - [x] Generic huggingface pipeline e.g. gpt-2, MPT
 - [x] Mistral 7b
+- [x] Several quantized models using AWQ
 - [x] OpenAI-like interface using [llm-api-python](https://github.com/1b5d/llm-api-python)
 - [ ] Support RWKV-LM
 
@@ -25,7 +26,7 @@ LLM enthusiasts, developers, researchers, and creators are invited to join this 
 
 To run LLM-API on a local machine, you must have a functioning Docker engine. The following steps outline the process for running LLM-API:
 
-1. **Create a Configuration File**: Begin by creating a `config.yaml` file with the configurations as described below.
+1. **Create a Configuration File**: Begin by creating a `config.yaml` file with the configurations as described below (use the examples in `config.yaml.example`).
 
 ```
 models_dir: /models     # dir inside the container
@@ -147,7 +148,7 @@ curl --location 'localhost:8000/generate' \
 }'
 ```
 
-If you're looking to accelerate inference using a GPU, the `1b5d/llm-api:x.x.x-gpu` image is designed for this purpose. When running the Docker image using Compose, consider utilizing a dedicated Compose file for GPU support:
+If you're looking to accelerate inference using a GPU, the `1b5d/llm-api:latest-gpu` image is designed for this purpose. When running the Docker image using Compose, consider utilizing a dedicated Compose file for GPU support:
 
 ```
 docker compose -f docker-compose.gpu.yaml up
@@ -155,7 +156,7 @@ docker compose -f docker-compose.gpu.yaml up
 
 **Note**: currenty only `linux/amd64` architecture is supported for gpu images
 
-## Llama on CPU - using llama.cpp
+## Llama models on CPU - using llama.cpp
 
 Utilizing Llama on a CPU is made simple by configuring the model usage in a local `config.yaml` file. Below are the possible configurations:
 
@@ -210,6 +211,36 @@ curl --location 'localhost:8000/generate' \
 }'
 ```
 
+## AWQ quantized models - using AutoAWQ
+
+AWQ quantization is supported using the AutoAWQ implementation, below is an example config
+
+```
+models_dir: /models
+model_family: autoawq
+setup_params:
+  repo_id: <repo id>
+  tokenizer_repo_id: <repo id>
+  filename: <model file name>
+model_params:
+  trust_remote_code: False
+  fuse_layers: False
+  safetensors: True
+  device_map: "cuda:0"
+```
+
+To run this model, the gpu supported docker image is needed `1b5d/llm-api:latest-gpu`
+
+```
+docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:latest-gpu
+```
+
+Or you can use the docker-compose.gpu.yaml file available in this repo:
+
+```
+docker compose -f docker-compose.gpu.yaml up
+```
+
 ## Llama on GPU - using GPTQ-for-LLaMa
 
 **Important Note**: Before running Llama or Llama 2 on GPU, make sure to install the [NVIDIA Driver](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) on your host machine. You can verify the NVIDIA environment by executing the following command:
@@ -220,7 +251,7 @@ docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu20.04 nvidia-smi
 
 You should see a table displaying the current NVIDIA driver version and related information, confirming the proper setup.
 
-When running the Llama model with GPTQ-for-LLaMa 4-bit quantization, you can use a specialized Docker image designed for this purpose, `1b5d/llm-api:x.x.x-gpu`, as an alternative to the default image. You can run this mode using a separate Docker Compose file:
+When running the Llama model with GPTQ-for-LLaMa 4-bit quantization, you can use a specialized Docker image designed for this purpose, `1b5d/llm-api:latest-gpu`, as an alternative to the default image. You can run this mode using a separate Docker Compose file:
 
 ```
 docker compose -f docker-compose.gpu.yaml up
@@ -229,10 +260,10 @@ docker compose -f docker-compose.gpu.yaml up
 Or by directly running the container:
 
 ```
-docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:x.x.x-gpu
+docker run --gpus all -v $PWD/models/:/models:rw -v $PWD/config.yaml:/llm-api/config.yaml:ro -p 8000:8000 1b5d/llm-api:latest-gpu
 ```
 
-**Important Note**: The `llm-api:x.x.x-gptq-llama-cuda` and `llm-api:x.x.x-gptq-llama-triton` images have been deprecated. Please switch to the `1b5d/llm-api:x.x.x-gpu` image when GPU support is required
+**Important Note**: The `llm-api:x.x.x-gptq-llama-cuda` and `llm-api:x.x.x-gptq-llama-triton` images have been deprecated. Please switch to the `1b5d/llm-api:latest-gpu` image when GPU support is required
 
 Example config file:
 
@@ -271,5 +302,6 @@ curl --location 'localhost:8000/generate' \
 
 - [llama.cpp](https://github.com/ggerganov/llama.cpp) for making it possible to run Llama models on CPU. 
 - [llama-cpp-python](https://github.com/abetlen/llama-cpp-python) for the python bindings lib for `llama.cpp`.
-- [GPTQ-for-LLaMa](https://github.com/qwopqwop200/GPTQ-for-LLaMa) for providing a GPTQ implementation for Llama based models.
+- [GPTQ-for-LLaMa](https://github.com/qwopqwop200/GPTQ-for-LLaMa) for providing a GPTQ quantization implementation for Llama based models.
+- [AutoAWQ](https://github.com/casper-hansen/AutoAWQ) for providing an implementation for AWQ quantization
 - Huggingface for the great ecosystem of tooling they provide.
